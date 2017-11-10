@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CBYTE 3//Linuxでは3,Windowsでは2
+#define CBYTE 2//Linuxでは3,Windowsでは2
 #define STRLEN 48
 #define MAXLINK 10
 
@@ -70,6 +70,8 @@ extern Node* findNode(Word word, int p, Node *head, List *list);
 //全てのノード表示
 extern void printNodeTree(Node *ptr, List *list);
 
+//全てのノード表示
+extern void printNodeTree2(Node *ptr, List *list, int n, int m);
 extern void PPP(List *list);
 
 #endif

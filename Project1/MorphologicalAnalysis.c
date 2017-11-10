@@ -97,8 +97,9 @@ int main(void) {
 			makeFinNode(ptr, &list);
 		}
 	}
-	printNodeTree(list.tail, &list, 0, 0);
-	PPP(&list);
+	printNodeTree(list.tail, &list);
+	//printNodeTree2(list.head, &list, 0, 0);
+	//PPP(&list);
 	return 0;
 }
 
