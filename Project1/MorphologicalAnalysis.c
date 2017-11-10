@@ -15,9 +15,9 @@
 #include <string.h>
 #include "Node.h"
 
- //連結可能性辞書
+//連結可能性辞書
 int connection_array[ClassNum][ClassNum] = { { 0, 1, 0, 1, 0, 1, 0 }, { 0, 0, 0, 1, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 1 },
-		{ 0, 0, 1, 1, 1, 1, 1 }, { 0, 0, 0, 1, 0, 0, 1 }, { 0, 0, 1, 1, 1, 0, 1 }, { 0, 0, 0, 0, 0, 0, 0 } };
+		{ 0, 0, 1, 1, 1, 1, 1 }, { 0, 0, 0, 1, 0, 1, 1 }, { 0, 0, 1, 1, 0, 0, 1 }, { 0, 0, 0, 0, 0, 0, 0 } };
 
 //連結可能性を返す
 int connection(Word a, Word b) {
@@ -42,16 +42,16 @@ int dictionary(char str[], Word wa[]) {
 //ポインタの位置から検索される単語の配列を返す
 //一致したものをwaに格納,一致数を返す
 int findWord(char string[], int p, Word wa[]) {
-	int string_num = strlen(string + (p * CBYTE)) / CBYTE;//pの位置からの日本語文字数
-	char string_search[STRLEN];//探索したい文字列
-	int num = 0;//一致数
+	int string_num = strlenJP(string + (p * CBYTE)); //pの位置からの日本語文字数
+	char string_search[STRLEN]; //探索したい文字列
+	int num = 0; //一致数
 
 	int i;
 	Word wp[MAXLINK];
-	for (i = 1; i < string_num; i++) {//(1:こ,2:この,3このひ…)
+	for (i = 1; i <= string_num; i++) { //(1:こ,2:この,3このひ…)
 		//探索する文字列を作成
-		strncpy(string_search, string + (p * CBYTE), (i*CBYTE));
-		string_search[i*CBYTE] = '\0';
+		strncpy(string_search, string + (p * CBYTE), (i * CBYTE));
+		string_search[i * CBYTE] = '\0';
 		//探索結果を配列arrayに連結
 		int search_num;
 		if ((search_num = dictionary(string_search, wp)) != 0) {
@@ -66,25 +66,39 @@ int findWord(char string[], int p, Word wa[]) {
 
 int main(void) {
 	char main_str[] = "このひとことで元気になった";
+	int main_str_len = strlenJP(main_str);
 	List list;
 	Node *ptr;
 
-	InitFrameNode(&list);
+	InitFrameNode(&list);		//ノード構造初期化
 	while ((ptr = findnextnullNode(list.head, &list)) != NULL) {
 		//pの位置から始まる単語検索
 		Word w[MAXLINK];
 		int num;
-		if ((num = findWord(main_str, ptr->pnext, w)) != 0) {
-			printWordArray(w, num);
-			//単語をノードとして追加
-			int i;
-			for (i = 0; i < num; i++) {
-				if (connection(ptr->word, w[i])) { //ptrとwの単語が連結可能なら
-					makeNode(ptr, w[i], ptr->pnext, &list); //ノード作成
+		//文末であるとき
+		if (main_str_len == ptr->pnext) {
+			//ptrと文末が連結可能なら
+			if (connection(ptr->word, ((Node*) list.tail)->word))
+				makeTailNode(ptr, &list);		//文末を接続
+		} else {
+			//文末ではないとき次の位置から始まる文字列を検索
+			if ((num = findWord(main_str, ptr->pnext, w)) != 0) {
+				//単語をノードとして追加
+				int i;
+				for (i = 0; i < num; i++) {
+					if (connection(ptr->word, w[i])) { //ptrとwの単語が連結可能なら
+						makeNode(ptr, w[i], ptr->pnext, &list); //ノード作成
+					}
 				}
 			}
 		}
+		//ptr->nextに何もついていないなら終了ノードを作成
+		if (ptr->nextnum == 0) {
+			makeFinNode(ptr, &list);
+		}
 	}
+	printNodeTree(list.tail, &list, 0, 0);
+	PPP(&list);
 	return 0;
 }
 
