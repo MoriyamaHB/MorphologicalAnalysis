@@ -98,10 +98,6 @@ int main(void) {
 		}
 	}
 	printPath(&list);
-	//printf("path=%d\n", calcPathNum(list.head, &list));
-	//printNodeTree(list.tail, &list);
-	//printNodeTree2(list.head, &list, 0, 0);
-	//PPP(&list);
 	return 0;
 }
 

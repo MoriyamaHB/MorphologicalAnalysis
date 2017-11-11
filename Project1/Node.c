@@ -233,6 +233,7 @@ void printPath(List *list) {
 	printAllNumberPath(list);
 }
 
+//全てのノード表示
 void printNodeTree(Node *t, List *list) {
 	if (t == list->head) {
 		printNode(t);
