@@ -123,7 +123,7 @@ Node* findNode(Word word, int p, Node *ptr, List *list) {
 }
 
 //全ノードのPATH数を計算
-//各ノード以下のPATHの数をメンバpathに記録
+//各ノード以下のPATHの数をメンバpathnumに記録
 static int calcPathNum(Node* h, List *list) {
 	if (h == list->tail) {
 		h->pathnum = 1;
