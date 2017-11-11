@@ -97,7 +97,8 @@ int main(void) {
 			makeFinNode(ptr, &list);
 		}
 	}
-	printf("path=%d\n", calcNodePath(list.head, &list));
+	printPath(&list);
+	//printf("path=%d\n", calcPathNum(list.head, &list));
 	//printNodeTree(list.tail, &list);
 	//printNodeTree2(list.head, &list, 0, 0);
 	//PPP(&list);

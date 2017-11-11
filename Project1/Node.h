@@ -23,14 +23,17 @@ typedef struct {
 
 //ノード
 typedef struct {
-	struct Node *prev[10];
-	struct Node *next[10];
+	struct Node *prev[MAXLINK];
+	struct Node *next[MAXLINK];
 	int prevnum, nextnum;
 	Word word;
 	int p;
 	int pnext;
-	int path;//このノード以下にある道の数
-	int pathnum[MAXPATH];//このノードを通るPATH番号
+	int pathnum;//このノード以下にある道の数
+	int pathnum_branch[MAXLINK];//このノード以下にある道の数(枝用)
+	int path[MAXPATH];//このノードを通るPATH番号
+	int path_n;//PATH番号の格納数
+	int has_number_path;//番号割り振り済みか
 } Node;
 
 //リスト
@@ -70,10 +73,10 @@ extern Node* findnextnullNode(Node* h, List *list);
 //同じノード探索
 extern Node* findNode(Word word, int p, Node *head, List *list);
 
-//全ノードのPATHを計算
-extern int calcNodePath(Node* h, List *list);
-
 //全てのノード表示
 extern void printNodeTree(Node *t, List *list);
+
+//全PATHの表示(1回のみ)
+extern void printPath(List *list);
 
 #endif
