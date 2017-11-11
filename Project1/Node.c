@@ -1,6 +1,6 @@
 ﻿#include "Node.h"
 
-static char ClassStr[ClassNum][STRLEN] = { "|文頭|", "連体詞", "接尾詞", "名詞", "助動詞", "動詞", "|文末|", "|終了" };
+static char ClassStr[ClassNum][STRLEN] = { "|文頭|", "連体詞", "接尾詞", "名詞", "助動詞", "動詞", "|文末|", "|終了|" };
 
 void printWord(Word w) {
 	printf("%s\n", ClassStr[w.class]);
@@ -78,18 +78,18 @@ void makeFinNode(Node *p, List *list) {
 }
 
 /*次にさすポインタがNULlのノードを返す*/
-Node* findnextnullNode(Node *ptr, List *list) {
+Node* findnextnullNode(Node *h, List *list) {
 
-	if (ptr == list->fin || ptr == list->tail)
+	if (h == list->fin || h == list->tail)
 		return NULL;
 
-	if (ptr->next[0] == NULL)
-		return ptr;
+	if (h->next[0] == NULL)
+		return h;
 
 	int i;
 	Node* re;
-	for (i = 0; i < ptr->nextnum; i++) {
-		if ((re = findnextnullNode(ptr->next[i], list)) != NULL)
+	for (i = 0; i < h->nextnum; i++) {
+		if ((re = findnextnullNode(h->next[i], list)) != NULL)
 			return re;
 	}
 	return NULL;
@@ -113,73 +113,48 @@ Node* findNode(Word word, int p, Node *ptr, List *list) {
 	return NULL;
 }
 
-//void printNodeTree(Node *ptr, List *list) {
-//	if (ptr == list->head) {
-//		printNode(ptr);
-//		return;
-//	}
-//	int i;
-//	for (i = ptr->prevnum - 1; i >= 0; i--) {
-//		printNodeTree(ptr->prev[i], list);
-//	}
-//	printNode(ptr);
-//	return;
-//
-//}
-
-void printNodeTree(Node *ptr, List *list) {
-	Node* n = list->head;
-	while (n) {
-		printNode(n);
-		n = n->next[0];
+//全ノードのPATH数を計算
+//各ノード以下のPATHの数をメンバpathに記録
+int calcNodePath(Node* h, List *list) {
+	if (h == list->tail) {
+		h->path = 1;
+		return 1;
 	}
-	return;
+	if (h == list->fin) {
+		return 0;
+	}
+	int i, total = 0;
+	for (i = 0; i < h->nextnum; i++) {
+		total += calcNodePath(h->next[i], list);
+	}
+	return total;
 }
 
-#define MAXPATH 30
-Node* node[MAXPATH][MAXLINK] = { 0 };
-int ng = 0;
-
-void printNodeTree2(Node *ptr, List *list, int n, int m) {
-	if (ptr == list->tail) {
-		node[n][m] = ptr;
+//このノードを通るPATH番号をつける
+static void numberNodePath(Node* t, List *list) {
+	if (t == list->head) {
+		printNode(t);
 		return;
 	}
 	int i;
-	for (i = 0; i < ptr->nextnum; i++) {
-		if (i != 0) {
-			memcpy(node[n + i], node[n], sizeof(Node*) * MAXLINK);
-			ng++;
-		}
-		printNodeTree2(ptr->next[i], list, n + i, m);
+	for (i = t->prevnum - 1; i >= 0; i--) {
+		printNodeTree(t->prev[i], list);
 	}
-	node[n][m++] = ptr;
+	printNode(t);
 	return;
 }
 
-//void printNodeTree2(Node *ptr, List *list, int n, int m) {
-//	if (ptr == list->head) {
-//		node[n][m] = ptr;
-//		return;
-//	}
-//	int i;
-//	for (i = 0; i < ptr->prevnum; i++) {
-//		if (i != 0) {
-//			memcpy(node[n + i], node[n], sizeof(Node*) * MAXLINK);
-//			ng++;
-//		}
-//		printNodeTree2(ptr->prev[i], list, n + i, m);
-//	}
-//	node[n][m++] = ptr;
-//	return;
-//}
-
-void PPP(List *list) {
-	int i, j;
-	for (i = 0; i < ng; i++) {
-		for (j = 0; node[i][j] != list->tail; j++) {
-			printNode(node[i][j]);
-		}
+void printNodeTree(Node *t, List *list) {
+	if (t == list->head) {
+		printNode(t);
+		return;
 	}
+	int i;
+	for (i = t->prevnum - 1; i >= 0; i--) {
+		printNodeTree(t->prev[i], list);
+	}
+	printNode(t);
+	return;
+
 }
 
