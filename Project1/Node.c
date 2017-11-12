@@ -84,7 +84,8 @@ static Node* newNode(Node* prev) {
 	if (prev == NULL) {
 		n->prev[0] = NULL;
 		n->prevnum = 0;
-	} else {
+	}
+	else {
 		n->prev[0] = prev;
 		n->prevnum = 1;
 	}
@@ -100,11 +101,11 @@ static Node* newNode(Node* prev) {
 
 void InitFrameNode(List *list) {
 	list->head = newNode(NULL);
-	((Node*) list->head)->word.class = BUNTO;
+	((Node*)list->head)->word.class = BUNTO;
 	list->fin = newNode(NULL);
-	((Node*) list->fin)->word.class = FIN;
+	((Node*)list->fin)->word.class = FIN;
 	list->tail = newNode(NULL);
-	((Node*) list->tail)->word.class = BUNMATSU;
+	((Node*)list->tail)->word.class = BUNMATSU;
 }
 
 void makeNode(Node* p, Word word, int n, List *list) {
@@ -115,7 +116,8 @@ void makeNode(Node* p, Word word, int n, List *list) {
 		new->pnext = n + strlenJP(word.str);
 		new->word = word;
 		p->next[p->nextnum++] = new;
-	} else {
+	}
+	else {
 		p->next[p->nextnum++] = ptr;
 		ptr->prev[ptr->prevnum++] = p;
 	}
@@ -123,12 +125,12 @@ void makeNode(Node* p, Word word, int n, List *list) {
 
 void makeTailNode(Node *p, List *list) {
 	p->next[p->nextnum++] = list->tail;
-	((Node*) list->tail)->prev[((Node*) list->tail)->prevnum++] = p;
+	((Node*)list->tail)->prev[((Node*)list->tail)->prevnum++] = p;
 }
 
 void makeFinNode(Node *p, List *list) {
 	p->next[p->nextnum++] = list->fin;
-	((Node*) list->fin)->prev[((Node*) list->fin)->prevnum++] = p;
+	((Node*)list->fin)->prev[((Node*)list->fin)->prevnum++] = p;
 }
 
 /*次にさすポインタがNULlのノードを返す*/
@@ -201,7 +203,7 @@ static void numberNodePath(Node* h, List *list) {
 	int i;
 	int j;
 	for (i = 0; i < h->nextnum; i++) {
-		for (j = 0; j < ((Node*) h->next[i])->pathnum; j++) {
+		for (j = 0; j < ((Node*)h->next[i])->pathnum; j++) {
 			addPathNumber(h->next[i], h->path[h->has_number_path_n++]);
 		}
 		numberNodePath(h->next[i], list);
@@ -234,11 +236,12 @@ static void printNumberPath(int num, Node *t, List *list) {
 //全Pathの表示
 static void printAllNumberPath(List *list) {
 	int i;
-	for (i = 0; i < ((Node*) list->head)->pathnum; i++) {
-		printf("\n========== %d ============\n", i);
+	for (i = 0; i < ((Node*)list->head)->pathnum; i++) {
+		printf("\n=========================== %d ===========================\n", i + 1);
 		printNumberPath(i, list->tail, list);
 		putchar('\n');
 	}
+	putchar('\n');
 	return;
 }
 
