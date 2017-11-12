@@ -33,7 +33,7 @@ typedef struct {
 	int pathnum_branch[MAXLINK];//このノード以下にある道の数(枝用)
 	int path[MAXPATH];//このノードを通るPATH番号
 	int path_n;//PATH番号の格納数
-	int has_number_path;//番号割り振り済みか
+	int has_number_path_n;//番号割り振り済みか
 } Node;
 
 //リスト

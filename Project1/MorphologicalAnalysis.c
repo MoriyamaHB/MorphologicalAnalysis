@@ -26,7 +26,7 @@ int connection(Word a, Word b) {
 
 //単語辞書配列
 Word dictionary_array[] = { { "こ", SETSUBI }, { "この", RENTAI }, { "ひ", MEI }, { "と", JO }, { "ひと", MEI }, { "こと", MEI },
-		{ "ひとこと", MEI }, { "で", DOU }, { "で", MEI }, { "元気", MEI }, { "に", JO }, { "なった", DOU }, { "になった", DOU } };
+		{ "ひとこと", MEI }, { "で", DOU }, { "で", JO }, { "元気", MEI }, { "に", JO }, { "なった", DOU }, { "になった", DOU } };
 
 //単語辞書(一致したものをwaに格納,一致数を返す)
 int dictionary(char str[], Word wa[]) {

@@ -1,6 +1,6 @@
 ﻿#include "Node.h"
 
-static char ClassStr[ClassNum][STRLEN] = { "|文頭|", "連体詞", "接尾詞", "名詞", "助動詞", "動詞", "|文末|", "|終了|" };
+static char ClassStr[ClassNum][STRLEN] = { "|文頭|", "連体詞", "接尾詞", "名詞", "助詞", "動詞", "|文末|", "|終了|" };
 
 void printWord(Word w) {
 	printf("%s\n", ClassStr[w.class]);
@@ -28,6 +28,34 @@ void printNode(Node *n) {
 	putchar('\n');
 }
 
+//Nodeがあるpath番号を持っているか
+static int hasPathNumber(Node *node, int n) {
+	int i;
+	for (i = 0; i < node->path_n; i++) {
+		if (node->path[i] == n)
+			return 1;
+	}
+	return 0;
+}
+
+//Nodeにpath番号を振る
+static void addPathNumber(Node *node, int n) {
+	if (hasPathNumber(node, n) == 1)
+		return;
+	node->path[node->path_n++] = n;
+	return;
+}
+
+//Nodeからnのpath番号を取り除く
+static void removePathNumber(Node *node, int n) {
+	int i;
+	for (i = 0; i < node->path_n; i++) {
+		if (node->path[i] == n)
+			node->path[i] = -1;
+	}
+	return;
+}
+
 int strlenJP(char str[]) {
 	return strlen(str) / CBYTE;
 }
@@ -48,7 +76,7 @@ static Node* newNode(Node* prev) {
 	n->pnext = 0;
 	n->pathnum = 0;
 	n->path_n = 0;
-	n->has_number_path = 0;
+	n->has_number_path_n = 0;
 	return n;
 }
 
@@ -110,7 +138,7 @@ Node* findNode(Word word, int p, Node *ptr, List *list) {
 	if (ptr == list->fin || ptr == list->tail)
 		return NULL;
 
-	if (strcmp(ptr->word.str, word.str) == 0 && ptr->p == p)
+	if (strcmp(ptr->word.str, word.str) == 0 && ptr->p == p && ptr->word.class == word.class)
 		return ptr;
 
 	int i;
@@ -143,56 +171,58 @@ static int calcPathNum(Node* h, List *list) {
 }
 
 //ノードを通るPATH番号をつける
-static void numberNodePath(Node* t, List *list) {
-	if (t->has_number_path == 1)
+static void numberNodePath(Node* h, List *list) {
+	if (h == list->tail || h == list->fin) {
 		return;
-	if (t == list->head) {
+	}
+	if (h == list->head) {
 		int i;
-		for (i = 0; i < t->pathnum; i++) {
-			t->path[t->path_n++] = i;
+		for (i = 0; i < h->pathnum; i++) {
+			addPathNumber(h, i);
 		}
-		int j, cnt = 0;
-		for (i = 0; i < t->nextnum; i++) {
-			for (j = 0; j < (t->path_n * t->pathnum_branch[i]) / t->pathnum; j++) {
-				((Node*)t->next[i])->path[((Node*)t->next[i])->path_n++] = t->path[cnt++];
-			}
-		}
-		t->has_number_path = 1;//番号割り振り済み
-		return;
 	}
 	int i;
-	for (i = 0; i < t->prevnum; i++) {
-		numberNodePath(t->prev[i], list);
-	}
-	int j, cnt = 0;
-	for (i = 0; i < t->nextnum; i++) {
-		for (j = 0; j < (t->path_n * t->pathnum_branch[i]) / t->pathnum; j++) {
-			((Node*)t->next[i])->path[((Node*)t->next[i])->path_n++] = t->path[cnt++];
+	int j;
+	for (i = 0; i < h->nextnum; i++) {
+		for (j = 0; j < ((Node*)h->next[i])->pathnum; j++) {
+			addPathNumber(h->next[i], h->path[h->has_number_path_n++]);
 		}
+		numberNodePath(h->next[i], list);
 	}
-	t->has_number_path = 1;//番号割り振り済み
 	return;
 }
 
-//Nodeがあるpath番号を持っているか
-static int hasPathNumber(Node *node, int n) {
-	int i;
-	for (i = 0; i < node->path_n; i++) {
-		if (node->path[i] == n)
-			return 1;
-	}
-	return 0;
-}
-
-//Nodeからnのpath番号を取り除く
-static void removePathNumber(Node *node, int n) {
-	int i;
-	for (i = 0; i < node->path_n; i++) {
-		if (node->path[i] == n)
-			node->path[i] = -1;
-	}
-	return;
-}
+//ノードを通るPATH番号をつける
+//static void numberNodePath(Node* t, List *list) {
+//	if (t->has_number_path == 1)
+//		return;
+//	if (t == list->head) {
+//		int i;
+//		for (i = 0; i < t->pathnum; i++) {
+//			t->path[t->path_n++] = i;
+//		}
+//		int j, cnt = 0;
+//		for (i = 0; i < t->nextnum; i++) {
+//			for (j = 0; j < (t->path_n * t->pathnum_branch[i]) / t->pathnum; j++) {
+//				((Node*)t->next[i])->path[((Node*)t->next[i])->path_n++] = t->path[cnt++];
+//			}
+//		}
+//		t->has_number_path = 1;//番号割り振り済み
+//		return;
+//	}
+//	int i;
+//	for (i = 0; i < t->prevnum; i++) {
+//		numberNodePath(t->prev[i], list);
+//	}
+//	int j, cnt = 0;
+//	for (i = 0; i < t->nextnum; i++) {
+//		for (j = 0; j < (t->path_n * t->pathnum_branch[i]) / t->pathnum; j++) {
+//			((Node*)t->next[i])->path[((Node*)t->next[i])->path_n++] = t->path[cnt++];
+//		}
+//	}
+//	t->has_number_path = 1;//番号割り振り済み
+//	return;
+//}
 
 //Path番号nのPath表示
 static void printNumberPath(int num, Node *t, List *list) {
@@ -229,7 +259,8 @@ static void printAllNumberPath(List *list) {
 //全PATHの表示(1回のみ)
 void printPath(List *list) {
 	printf("path=%d\n", calcPathNum(list->head, list));
-	numberNodePath(list->tail, list);
+	numberNodePath(list->head, list);
+	//printNodeTree(list->tail, list);
 	printAllNumberPath(list);
 }
 
