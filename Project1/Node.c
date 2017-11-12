@@ -28,6 +28,25 @@ void printNode(Node *n) {
 	putchar('\n');
 }
 
+void printWordRow(Word w) {
+
+	if (w.class == BUNTO) {
+		printf("%s", ClassStr[w.class]);
+		printf(" / ", w.str);
+		return;
+	}
+	if (w.class == BUNMATSU || w.class == FIN) {
+		printf("%s", ClassStr[w.class]);
+		return;
+	}
+	printf("%s", w.str);
+	printf("(%s) / ", ClassStr[w.class]);
+}
+
+void printNodeRow(Node *n) {
+	printWordRow(n->word);
+}
+
 //Nodeがあるpath番号を持っているか
 static int hasPathNumber(Node *node, int n) {
 	int i;
@@ -65,8 +84,7 @@ static Node* newNode(Node* prev) {
 	if (prev == NULL) {
 		n->prev[0] = NULL;
 		n->prevnum = 0;
-	}
-	else {
+	} else {
 		n->prev[0] = prev;
 		n->prevnum = 1;
 	}
@@ -82,11 +100,11 @@ static Node* newNode(Node* prev) {
 
 void InitFrameNode(List *list) {
 	list->head = newNode(NULL);
-	((Node*)list->head)->word.class = BUNTO;
+	((Node*) list->head)->word.class = BUNTO;
 	list->fin = newNode(NULL);
-	((Node*)list->fin)->word.class = FIN;
+	((Node*) list->fin)->word.class = FIN;
 	list->tail = newNode(NULL);
-	((Node*)list->tail)->word.class = BUNMATSU;
+	((Node*) list->tail)->word.class = BUNMATSU;
 }
 
 void makeNode(Node* p, Word word, int n, List *list) {
@@ -97,8 +115,7 @@ void makeNode(Node* p, Word word, int n, List *list) {
 		new->pnext = n + strlenJP(word.str);
 		new->word = word;
 		p->next[p->nextnum++] = new;
-	}
-	else {
+	} else {
 		p->next[p->nextnum++] = ptr;
 		ptr->prev[ptr->prevnum++] = p;
 	}
@@ -106,12 +123,12 @@ void makeNode(Node* p, Word word, int n, List *list) {
 
 void makeTailNode(Node *p, List *list) {
 	p->next[p->nextnum++] = list->tail;
-	((Node*)list->tail)->prev[((Node*)list->tail)->prevnum++] = p;
+	((Node*) list->tail)->prev[((Node*) list->tail)->prevnum++] = p;
 }
 
 void makeFinNode(Node *p, List *list) {
 	p->next[p->nextnum++] = list->fin;
-	((Node*)list->fin)->prev[((Node*)list->fin)->prevnum++] = p;
+	((Node*) list->fin)->prev[((Node*) list->fin)->prevnum++] = p;
 }
 
 /*次にさすポインタがNULlのノードを返す*/
@@ -184,45 +201,13 @@ static void numberNodePath(Node* h, List *list) {
 	int i;
 	int j;
 	for (i = 0; i < h->nextnum; i++) {
-		for (j = 0; j < ((Node*)h->next[i])->pathnum; j++) {
+		for (j = 0; j < ((Node*) h->next[i])->pathnum; j++) {
 			addPathNumber(h->next[i], h->path[h->has_number_path_n++]);
 		}
 		numberNodePath(h->next[i], list);
 	}
 	return;
 }
-
-//ノードを通るPATH番号をつける
-//static void numberNodePath(Node* t, List *list) {
-//	if (t->has_number_path == 1)
-//		return;
-//	if (t == list->head) {
-//		int i;
-//		for (i = 0; i < t->pathnum; i++) {
-//			t->path[t->path_n++] = i;
-//		}
-//		int j, cnt = 0;
-//		for (i = 0; i < t->nextnum; i++) {
-//			for (j = 0; j < (t->path_n * t->pathnum_branch[i]) / t->pathnum; j++) {
-//				((Node*)t->next[i])->path[((Node*)t->next[i])->path_n++] = t->path[cnt++];
-//			}
-//		}
-//		t->has_number_path = 1;//番号割り振り済み
-//		return;
-//	}
-//	int i;
-//	for (i = 0; i < t->prevnum; i++) {
-//		numberNodePath(t->prev[i], list);
-//	}
-//	int j, cnt = 0;
-//	for (i = 0; i < t->nextnum; i++) {
-//		for (j = 0; j < (t->path_n * t->pathnum_branch[i]) / t->pathnum; j++) {
-//			((Node*)t->next[i])->path[((Node*)t->next[i])->path_n++] = t->path[cnt++];
-//		}
-//	}
-//	t->has_number_path = 1;//番号割り振り済み
-//	return;
-//}
 
 //Path番号nのPath表示
 static void printNumberPath(int num, Node *t, List *list) {
@@ -231,7 +216,7 @@ static void printNumberPath(int num, Node *t, List *list) {
 	if (t == list->head) {
 		if (hasPathNumber(t, num) == 1) {
 			removePathNumber(t, num);
-			printNode(t);
+			printNodeRow(t);
 		}
 		return;
 	}
@@ -241,7 +226,7 @@ static void printNumberPath(int num, Node *t, List *list) {
 	}
 	if (hasPathNumber(t, num) == 1) {
 		removePathNumber(t, num);
-		printNode(t);
+		printNodeRow(t);
 	}
 	return;
 }
@@ -249,9 +234,10 @@ static void printNumberPath(int num, Node *t, List *list) {
 //全Pathの表示
 static void printAllNumberPath(List *list) {
 	int i;
-	for (i = 0; i < ((Node*)list->head)->pathnum; i++) {
+	for (i = 0; i < ((Node*) list->head)->pathnum; i++) {
 		printf("\n========== %d ============\n", i);
 		printNumberPath(i, list->tail, list);
+		putchar('\n');
 	}
 	return;
 }
